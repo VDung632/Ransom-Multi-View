@@ -1,0 +1,253 @@
+.App {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.App-header {
+  background-color: #282c34;
+  padding: 20px;
+  color: white;
+}
+
+main {
+  padding: 20px;
+}
+
+.apk-upload-container {
+  margin-bottom: 30px;
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 600px;
+  margin: 20px auto;
+  background-color: #f9f9f9;
+}
+
+.apk-upload-container input[type="file"] {
+  display: block;
+  margin: 10px auto;
+}
+
+.apk-upload-container button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.apk-upload-container button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.results-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.apk-info-display,
+.prediction-result,
+.image-display {
+  text-align: left;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f5f5f5;
+}
+
+.apk-info-display h3,
+.prediction-result h3,
+.image-display h3 {
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.image-item {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #fff;
+}
+
+.image-item img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto 10px auto;
+  border: 1px solid #eee;
+}
+
+.image-item p {
+  font-size: 0.9em;
+  color: #555;
+  word-break: break-all;
+}
+
+.error-message {
+  color: red;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+.ransomware-label {
+  color: red;
+  font-weight: bold;
+}
+
+.benign-label {
+  color: green;
+  font-weight: bold;
+}
+
+.drop-zone {
+  border: 2px dashed #007bff;
+  border-radius: 10px;
+  padding: 30px;
+  text-align: center;
+  margin: 20px auto;
+  background-color: #f0f8ff;
+  color: #333;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.drop-zone.drag-over {
+  background-color: #e6f7ff;
+  border-color: #0056b3;
+}
+
+.drop-zone p {
+  margin: 5px 0;
+  font-size: 1.1em;
+}
+
+.file-input-label {
+  display: inline-block;
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 15px;
+  transition: background-color 0.2s ease;
+}
+
+.file-input-label:hover {
+  background-color: #0056b3;
+}
+
+.selected-file-name {
+  margin-top: 15px;
+  font-size: 1.1em;
+  color: #4CAF50;
+}
+
+/* Đảm bảo các style lỗi được định nghĩa */
+.error-message {
+  color: red;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.static-features-display {
+  text-align: left;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f5f5f5;
+  margin-top: 20px;
+}
+
+.static-features-display h3 {
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.static-features-display .basic-features table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.static-features-display .basic-features th,
+.static-features-display .basic-features td {
+  border: 1px solid #eee;
+  padding: 8px;
+  text-align: left;
+}
+
+.static-features-display .basic-features tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.static-features-display .list-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.static-features-display .feature-list-item {
+  flex: 1 1 calc(50% - 15px); /* 2 cột trên desktop */
+  min-width: 280px; /* Đảm bảo kích thước tối thiểu */
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  padding: 10px;
+  background-color: #ffffff;
+}
+
+.static-features-display .feature-list-item h5 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #555;
+  font-size: 1.1em;
+}
+
+.static-features-display .feature-list-item ul {
+  list-style-type: disc;
+  padding-left: 20px;
+  max-height: 150px; /* Giới hạn chiều cao và thêm scroll */
+  overflow-y: auto;
+  border: 1px solid #f0f0f0;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background-color: #fcfcfc;
+}
+
+.static-features-display .feature-list-item li {
+  margin-bottom: 3px;
+  word-break: break-all;
+  font-size: 0.9em;
+  color: #666;
+}
+
+/* Responsive cho màn hình nhỏ hơn */
+@media (max-width: 768px) {
+  .static-features-display .list-features {
+    flex-direction: column;
+  }
+  .static-features-display .feature-list-item {
+    flex: 1 1 100%;
+  }
+}

@@ -1,0 +1,7 @@
+Flask
+Pillow
+tensorflow
+numpy
+androguard 
+pandas 
+Flask-Cors
