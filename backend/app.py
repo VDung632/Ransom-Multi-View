@@ -189,7 +189,7 @@ def get_results_by_sha256(sha256):
 
     # Cố gắng lấy original_filename nếu có thể, ví dụ từ một metadata file hoặc cache
     # Hiện tại không có, nên ta sẽ dùng SHA256 làm tên file gốc tạm thời
-    original_filename = sha256 + ".apk" # Fallback
+    original_filename = static_feat.get("FileName", "N/A") # Fallback
     # Nếu bạn muốn lưu original_filename, bạn sẽ cần một cơ chế lưu trữ (ví dụ: DB hoặc file JSON nhỏ trong thư mục output)
 
     extracted_info = {

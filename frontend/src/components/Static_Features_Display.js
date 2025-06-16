@@ -71,7 +71,7 @@ function StaticFeaturesDisplay({ features }) {
       </div>
 
       <div className="list-features">
-        <h4>Danh sách chi tiết</h4>
+        <h4 style={{width: "100%"}}>Danh sách chi tiết</h4>
         {listKeys.map(key => {
           const rawValue = listFeatures[key];
           // Sử dụng hàm mới để phân tích cú pháp chuỗi
