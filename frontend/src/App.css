@@ -59,8 +59,7 @@ main {
 }
 
 .apk-info-display,
-.prediction-result,
-.image-display {
+.prediction-result {
   text-align: left;
   padding: 15px;
   border: 1px solid #ddd;
@@ -88,14 +87,6 @@ main {
   padding: 10px;
   border-radius: 5px;
   background-color: #fff;
-}
-
-.image-item img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  margin: 0 auto 10px auto;
-  border: 1px solid #eee;
 }
 
 .image-item p {

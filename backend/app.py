@@ -74,6 +74,7 @@ def upload_apk():
         print(f"Đã nhận APK: {final_filepath}")
 
         # --- Bước 0: Kiểm tra xem tệp APK đã được phân tích chưa?
+        # TODO: Thêm một biến số để xem người dùng có muốn phân tích lại không.
         apk_specific_output_dir = os.path.join(EXTRACTED_IMAGES_FOLDER, "extracted_images", apk_sha256)
         if os.path.exists(apk_specific_output_dir) and os.path.isdir(apk_specific_output_dir) and os.listdir(apk_specific_output_dir):
             # Nếu thư mục SHA256 tồn tại và không rỗng, có nghĩa là đã được phân tích
