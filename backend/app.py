@@ -73,6 +73,18 @@ def upload_apk():
 
         print(f"Đã nhận APK: {final_filepath}")
 
+        # --- Bước 0: Kiểm tra xem tệp APK đã được phân tích chưa?
+        apk_specific_output_dir = os.path.join(EXTRACTED_IMAGES_FOLDER, "extracted_images", apk_sha256)
+        if os.path.exists(apk_specific_output_dir) and os.path.isdir(apk_specific_output_dir) and os.listdir(apk_specific_output_dir):
+            # Nếu thư mục SHA256 tồn tại và không rỗng, có nghĩa là đã được phân tích
+            print(f"Tệp APK (SHA256: {apk_sha256}) đã được phân tích trước đó.")
+            # Xóa tệp tạm thời vừa tải lên
+            os.remove(final_filepath)
+            
+            # Trả về kết quả đã có, giống như endpoint /results/<sha256>
+            return get_results_by_sha256(apk_sha256) # Tái sử dụng hàm lấy kết quả
+
+
         # --- Bước 1: Trích xuất ảnh từ APK bằng main.py ---
         # output_base_dir cho main.py sẽ là thư mục EXTRACTED_IMAGES_FOLDER
         # main.py sẽ tạo các thư mục con bên trong nó (e.g., EXTRACTED_IMAGES_FOLDER/extracted_images/{apk_sha256}...)
