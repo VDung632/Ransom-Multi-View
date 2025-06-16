@@ -23,7 +23,7 @@ CORS(app)
 UPLOAD_FOLDER = 'uploads'
 EXTRACTED_IMAGES_FOLDER = 'apk_procession_output'
 MODEL_PATH = os.path.join('ransom_detector', 'Tuned_ConvNeXt.h5') # Đảm bảo tệp này nằm trong thư mục backend
-STATIC_FEATURES_CSV = os.path.join('Static_Features', "output.csv") # Tệp này dùng để lưu trữ các thông tin tĩnh khác nếu cần
+STATIC_FEATURES_CSV = os.path.join('Static_Features', "output.csv") # Tệp này dùng để lưu trữ các thông tin tĩnh của tất cả các tệp apk đã phân tích
 
 # Tạo các thư mục nếu chúng chưa tồn tại
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -75,10 +75,8 @@ def upload_apk():
 
         # --- Bước 1: Trích xuất ảnh từ APK bằng main.py ---
         # output_base_dir cho main.py sẽ là thư mục EXTRACTED_IMAGES_FOLDER
-        # main.py sẽ tạo các thư mục con bên trong nó (e.g., EXTRACTED_IMAGES_FOLDER/apk_name/images/...)
-        
-        apk_output_images_dir = os.path.join(EXTRACTED_IMAGES_FOLDER, apk_sha256)
-        
+        # main.py sẽ tạo các thư mục con bên trong nó (e.g., EXTRACTED_IMAGES_FOLDER/extracted_images/{apk_sha256}...)
+                
         try:
             # Gọi hàm run_apk_processing từ main.py
             extracted_images_root_dir = run_apk_processing(final_filepath, EXTRACTED_IMAGES_FOLDER)
@@ -101,24 +99,16 @@ def upload_apk():
                         for img_file in os.listdir(full_type_dir_path):
                             if img_file.endswith(".png") and apk_sha256 in img_file:
                                 # Tạo URL để frontend có thể truy cập ảnh
-                                # Đường dẫn sẽ là /extracted_images/images/{file_type_dir}/{img_file}
+                                # Đường dẫn sẽ là extracted_images/{apk_sha256}/{file_type_dir}/{img_file}
                                 relative_path = os.path.relpath(os.path.join(full_type_dir_path, img_file), EXTRACTED_IMAGES_FOLDER)
                                 image_urls.append(f"/extracted_images/{relative_path.replace(os.sep, '/')}")
             
-            # TODO: Cần trích xuất thông tin APK thực tế (tên gói, quyền, v.v.)
-            # Hiện tại, chúng ta chỉ có thể trả về thông tin giả định hoặc cần tích hợp Androguard ở đây
-            # Để đơn giản hóa, ở bước này chúng ta sẽ chỉ trả về tên tệp APK đã đổi tên.
-            # Để trích xuất thông tin thực sự, bạn sẽ cần tích hợp logic tương tự như trong `apk_processor.py`
-            # hoặc trực tiếp dùng thư viện androguard trong route này.
             static_feat = get_manifest_info(new_filename, STATIC_FEATURES_CSV)
             if static_feat is None:
                 static_feat = {"error": "Không thể tìm thấy đặc trưng tĩnh từ APK này."}
             else:
                 pass
-            
-                        
 
-            # Ví dụ về thông tin trích xuất giả định
             extracted_info = {
                 "package_name": "com.example.app",  # Thay thế bằng logic thực tế để lấy tên gói
                 "file_sha256": apk_sha256,
@@ -146,6 +136,63 @@ def upload_apk():
             # main.py đã tự dọn dẹp một số, nhưng cần đảm bảo thư mục apk_sha256 cũng được dọn.
             # Ở đây, chúng ta giữ lại thư mục này để frontend có thể truy cập ảnh.
             # Logic cleanup chi tiết hơn có thể cần được thêm nếu muốn xóa ảnh sau khi frontend tải xong.
+
+@app.route('/results/<sha256>', methods=['GET'])
+def get_results_by_sha256(sha256):
+    # đường dẫn đến hình: EXTRACTED_IMAGES_FOLDER/extracted_images/<sha256>/<file_types>
+    apk_specific_output_dir = os.path.join(EXTRACTED_IMAGES_FOLDER,"extracted_images", sha256)
+    actual_image_subfolder = os.path.join(apk_specific_output_dir, "images")
+
+    if not os.path.exists(apk_specific_output_dir):
+        return jsonify({"error": "Không tìm thấy kết quả cho SHA256 này."}), 404
+
+    # Tái tạo lại dữ liệu tương tự như khi upload_apk trả về
+    predictions = []
+    image_urls = []
+    extracted_info = {}
+
+    # 1. Tải ảnh URLs
+    if os.path.exists(actual_image_subfolder):
+        for file_type_dir in os.listdir(actual_image_subfolder):
+            full_type_dir_path = os.path.join(actual_image_subfolder, file_type_dir)
+            if os.path.isdir(full_type_dir_path):
+                for img_file in os.listdir(full_type_dir_path):
+                    if img_file.endswith(".png") and os.path.splitext(img_file)[0] == sha256:
+                        relative_path = os.path.relpath(os.path.join(full_type_dir_path, img_file), EXTRACTED_IMAGES_FOLDER)
+                        image_urls.append(f"/extracted_images/{relative_path.replace(os.sep, '/')}")
+    
+    # 2. Thực hiện lại dự đoán (hoặc lưu kết quả dự đoán và tải lại)
+    # Để đơn giản, tôi sẽ chạy lại dự đoán. Nếu mô hình lớn, cân nhắc lưu và tải lại kết quả.
+    if global_loaded_model:
+        predictions = run_prediction(global_loaded_model, actual_image_subfolder)
+    else:
+        print("CẢNH BÁO: Mô hình dự đoán không khả dụng khi tải lại kết quả.")
+
+    # 3. Lấy thông tin đặc trưng tĩnh
+    static_feat = get_manifest_info(f"{sha256}.apk", STATIC_FEATURES_CSV) # Giả định tên file gốc là SHA256.apk
+
+    if static_feat is None:
+        static_feat = {"error": "Không thể tìm thấy đặc trưng tĩnh từ APK này."}
+
+    # Cố gắng lấy original_filename nếu có thể, ví dụ từ một metadata file hoặc cache
+    # Hiện tại không có, nên ta sẽ dùng SHA256 làm tên file gốc tạm thời
+    original_filename = sha256 + ".apk" # Fallback
+    # Nếu bạn muốn lưu original_filename, bạn sẽ cần một cơ chế lưu trữ (ví dụ: DB hoặc file JSON nhỏ trong thư mục output)
+
+    extracted_info = {
+        "package_name": static_feat.get("App name", "N/A"),
+        "file_sha256": sha256,
+        "original_filename": original_filename, # Có thể cải thiện bằng cách lưu tên file gốc
+        "static_features": static_feat
+    }
+
+    return jsonify({
+        "message": "Kết quả đã tải thành công",
+        "extracted_info": extracted_info,
+        "predictions": predictions,
+        "image_urls": image_urls
+    }), 200
+
 
 @app.route('/extracted_images/<path:filename>')
 def serve_extracted_images(filename):

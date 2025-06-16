@@ -1,32 +1,27 @@
-import React, { useState } from 'react';
+// frontend/src/App.js
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import ApkUpload from './components/APK_upload';
-import ApkInfoDisplay from './components/APK_info_display';
-import PredictionResult from './components/APK_predict_result';
-import ImageDisplay from './components/Image_display';
-import StaticFeaturesDisplay from './components/Static_Features_Display';
-import './App.css'; // Để có thể thêm CSS tùy chỉnh
+import ResultPage from './components/ResultPage'; // Import component mới
+import './App.css';
 
-function App() {
-  const [apkInfo, setApkInfo] = useState(null);
-  const [predictions, setPredictions] = useState([]);
-  const [imageUrls, setImageUrls] = useState([]);
-  const [loading, setLoading] = useState(false); // loading toàn cục
-  const [error, setError] = useState(null); // error toàn cục
+// Component Wrapper để truy cập useNavigate trong App
+function AppContent() {
+  const navigate = useNavigate();
+  const [apkData, setApkData] = useState(null); // Lưu trữ toàn bộ dữ liệu từ backend
 
+  // Function được truyền xuống ApkUpload để cập nhật dữ liệu và chuyển hướng
   const handleUploadSuccess = (data) => {
-    setApkInfo(data.extracted_info);
-    setPredictions(data.predictions);
-    setImageUrls(data.image_urls);
-    setLoading(false);
-    setError(null);
+    setApkData(data); // Lưu toàn bộ dữ liệu trả về
+    // Chuyển hướng đến trang kết quả với SHA256
+    navigate(`/results/${data.extracted_info.file_sha256}`);
   };
 
-  const handleUploadError = (err) => {
-    setError(err);
-    setLoading(false);
-    setApkInfo(null);
-    setPredictions([]);
-    setImageUrls([]);
+  const handleUploadError = (error) => {
+    // Xử lý lỗi, có thể hiển thị thông báo lỗi trên trang upload
+    console.error("Lỗi tải lên trong App.js:", error);
+    setApkData(null); // Xóa dữ liệu cũ nếu có lỗi
+    alert(`Lỗi: ${error}`); // Hoặc hiển thị lỗi một cách trực quan hơn
   };
 
   return (
@@ -35,26 +30,27 @@ function App() {
         <h1>APK Ransomware Detector</h1>
       </header>
       <main>
-        <ApkUpload 
-          onUploadSuccess={handleUploadSuccess} 
-          onUploadError={handleUploadError}
-        />
-
-        {loading && <p>Đang xử lý APK của bạn, vui lòng đợi...</p>}
-        {error && <p className="error-message">Lỗi: {error}</p>}
-
-        {apkInfo && (
-          <div className="results-section">
-            <ApkInfoDisplay info={apkInfo} />
-            <PredictionResult predictions={predictions} />
-            {apkInfo.static_features && (
-              <StaticFeaturesDisplay features={apkInfo.static_features} />
-            )}
-            <ImageDisplay imageUrls={imageUrls} />
-          </div>
-        )}
+        <Routes>
+          <Route path="/" element={
+            <ApkUpload 
+              onUploadSuccess={handleUploadSuccess} 
+              onUploadError={handleUploadError} 
+            />
+          } />
+          <Route path="/results/:sha256" element={
+            <ResultPage initialApkData={apkData} onUploadError={handleUploadError} />
+          } />
+        </Routes>
       </main>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
   );
 }
 

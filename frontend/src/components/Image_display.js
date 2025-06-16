@@ -34,7 +34,7 @@ function ImageDisplay({ imageUrls }) {
             {/* Backend chạy trên cổng 5000 */}
             <p className="image-type">Loại: <strong>{getImageType(url).toUpperCase()}</strong></p>
             <img src={`http://localhost:5000${url}`} alt={`Extracted Image ${index}`} />
-            <p>{url.split('/').pop()}</p> {/* Hiển thị tên tệp ảnh */}
+            
           </div>
         ))}
       </div>

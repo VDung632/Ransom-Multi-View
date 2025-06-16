@@ -1,35 +1,32 @@
+// frontend/src/components/APK_upload.js
 import React, { useState, useCallback } from 'react';
 
 function ApkUpload({ onUploadSuccess, onUploadError }) {
   const [selectedFile, setSelectedFile] = useState(null);
-  const [isDragOver, setIsDragOver] = useState(false); // Trạng thái để theo dõi khi kéo qua vùng drop
-  const [error, setError] = useState(null); // Trạng thái để lưu lỗi nếu có
-  const [loading, setLoading] = useState(false); // Trạng thái để theo dõi quá trình tải lên
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  // Xử lý khi người dùng chọn tệp bằng input
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file && file.name.endsWith('.apk')) {
       setSelectedFile(file);
-      setError(null); // Xóa lỗi nếu có
+      setError(null);
     } else {
       setSelectedFile(null);
       setError("Chỉ chấp nhận tệp APK. Vui lòng chọn lại.");
     }
   };
 
-  // Xử lý sự kiện kéo qua (để cho phép drop)
   const handleDragOver = useCallback((event) => {
-    event.preventDefault(); // Quan trọng: Ngăn chặn hành vi mặc định của trình duyệt (mở tệp)
+    event.preventDefault();
     setIsDragOver(true);
   }, []);
 
-  // Xử lý sự kiện rời khỏi vùng kéo
   const handleDragLeave = useCallback(() => {
     setIsDragOver(false);
   }, []);
 
-  // Xử lý sự kiện thả tệp
   const handleDrop = useCallback((event) => {
     event.preventDefault();
     setIsDragOver(false);
@@ -39,7 +36,7 @@ function ApkUpload({ onUploadSuccess, onUploadError }) {
       const file = files[0];
       if (file.name.endsWith('.apk')) {
         setSelectedFile(file);
-        setError(null); // Xóa lỗi nếu có
+        setError(null);
       } else {
         setSelectedFile(null);
         setError("Chỉ chấp nhận tệp APK. Vui lòng chọn lại.");
@@ -68,17 +65,20 @@ function ApkUpload({ onUploadSuccess, onUploadError }) {
       const data = await response.json();
       
       if (response.ok) {
-        onUploadSuccess(data);
+        onUploadSuccess(data); // Gọi callback truyền dữ liệu lên App.js
       } else {
+        // Gọi callback onUploadError để App.js xử lý lỗi và hiển thị
         onUploadError(data.error || "Đã xảy ra lỗi khi tải lên tệp.");
+        setError(data.error || "Đã xảy ra lỗi khi tải lên tệp."); // Cập nhật lỗi cục bộ để hiển thị trên form
       }
     } catch (error) {
       console.error("Lỗi mạng hoặc server:", error);
       onUploadError("Không thể kết nối đến server. Vui lòng kiểm tra backend.");
+      setError("Không thể kết nối đến server. Vui lòng kiểm tra backend."); // Cập nhật lỗi cục bộ
     } finally {
-      // Có thể muốn giữ lại tệp đã chọn hoặc xóa nó tùy theo UX
-      // setSelectedFile(null);
       setLoading(false);
+      // Giữ lại selectedFile để người dùng có thể tải lại hoặc xem thông tin tệp đã chọn
+      // Hoặc reset nếu muốn bắt đầu lại hoàn toàn: setSelectedFile(null);
     }
   };
 
@@ -99,7 +99,7 @@ function ApkUpload({ onUploadSuccess, onUploadError }) {
           accept=".apk"
           onChange={handleFileChange}
           id="apkFile"
-          style={{ display: 'none' }} // Ẩn input mặc định
+          style={{ display: 'none' }}
         />
         <label htmlFor="apkFile" className="file-input-label">
           Chọn tệp APK
@@ -108,8 +108,7 @@ function ApkUpload({ onUploadSuccess, onUploadError }) {
 
       {selectedFile && <p className="selected-file-name">Tệp đã chọn: <strong>{selectedFile.name}</strong></p>}
       
-      {/* Hiển thị lỗi nếu có */}
-      {error && <p className="error-message">{setError}</p>}
+      {error && <p className="error-message">{error}</p>} {/* Hiển thị lỗi cục bộ */}
 
       <button onClick={handleUpload} disabled={!selectedFile || loading}>
         {loading ? 'Đang tải lên...' : 'Tải lên và Phân tích'}
