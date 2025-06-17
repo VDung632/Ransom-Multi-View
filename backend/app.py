@@ -13,6 +13,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'ransom_detector'))
 from main import run_apk_processing
 from detector import run_prediction, load_model_once
 from static_analyzer import get_manifest_info
+from explainer import Image_explainer
 
 # Áp dụng Flask_cors để cho phép các yêu cầu từ frontend
 from flask_cors import CORS
@@ -115,7 +116,7 @@ def upload_apk():
                                 # Đường dẫn sẽ là extracted_images/{apk_sha256}/{file_type_dir}/{img_file}
                                 relative_path = os.path.relpath(os.path.join(full_type_dir_path, img_file), EXTRACTED_IMAGES_FOLDER)
                                 image_urls.append(f"/extracted_images/{relative_path.replace(os.sep, '/')}")
-            
+
             static_feat = get_manifest_info(new_filename, STATIC_FEATURES_CSV)
             if static_feat is None:
                 static_feat = {"error": "Không thể tìm thấy đặc trưng tĩnh từ APK này."}
