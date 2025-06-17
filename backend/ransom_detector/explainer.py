@@ -25,13 +25,14 @@ def create_channel_specific_predict_fn(keras_model, channel_index_to_explain, or
         return predictions
     return channel_predict_fn
 
-def Image_explainer(original_image_5_channels, model, output_dir = "lime_explanations_per_channel_two_classes"):
+def Image_explainer(original_image_5_channels, model, output_dir = "lime_explanations_per_channel_two_classes", image_name=""):
     """
     Hàm giải thích kết quả cho mô hình trên từng kênh ảnh trong ảnh gốc
     Arg:
         original_image_5_channels: Ảnh xám 5 kênh từ khâu trích xuất
         model: mô hình CNN dùng để dự đoán
         output_dir: thư mục lưu ảnh đã qua giải thích
+        image_name: tên để lưu ảnh giải thích (không có đuôi)
     """
 
     # ---  Khởi tạo LimeImageExplainer ---
@@ -50,8 +51,11 @@ def Image_explainer(original_image_5_channels, model, output_dir = "lime_explana
 
     os.makedirs(output_dir, exist_ok=True)
 
+    # Tên loại ảnh ở từng kênh theo thứ tự 0 -> 4
+    img_types = ["xml", "arsc", "dex", "jar", "static"]
+
     for i in range(original_image_5_channels.shape[2]): # Lặp qua 5 kênh (0 đến 4)
-        print(f"\nĐang tạo giải thích LIME cho Kênh {i+1}...")
+        # print(f"\nĐang tạo giải thích LIME cho Kênh {i+1}...")
         
         image_for_lime_input = np.expand_dims(original_image_5_channels[:, :, i], axis=2) # (64, 64, 1)
 
@@ -123,13 +127,13 @@ def Image_explainer(original_image_5_channels, model, output_dir = "lime_explana
         # plt.title(f"LIME Explanation - Channel {i+1} (Class 0: {initial_prediction[0][0]:.2f} (Green), Class 1: {initial_prediction[0][1]:.2f}) (Red)")
         plt.axis('off')
         
-        file_name = os.path.join(output_dir, f"lime_explanation_channel_{i+1}_two_classes.png")
+        file_name = os.path.join(output_dir, image_name + f"_{img_types[i]}_explained.png")
         plt.savefig(file_name, bbox_inches='tight', pad_inches=0.1)
         plt.close()
 
-        print(f"Đã lưu giải thích cho Kênh {i+1} tại: {file_name}")
+        # print(f"Đã lưu giải thích cho Kênh {i+1} tại: {file_name}")
 
-    print("\nĐã hoàn tất việc tạo và lưu các ảnh giải thích LIME cho từng kênh và hai lớp.")
+    # print("\nĐã hoàn tất việc tạo và lưu các ảnh giải thích LIME cho từng kênh và hai lớp.")
 
 
 

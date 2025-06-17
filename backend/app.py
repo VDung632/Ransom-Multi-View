@@ -11,7 +11,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'apk2img_tool'))
 sys.path.append(os.path.join(os.path.dirname(__file__), 'ransom_detector'))
 
 from main import run_apk_processing
-from detector import run_prediction, load_model_once
+from detector import run_prediction, load_model_once, load_and_preprocess_images
 from static_analyzer import get_manifest_info
 from explainer import Image_explainer
 
@@ -104,8 +104,23 @@ def upload_apk():
             # --- Bước 2: Phân loại ảnh bằng detector.py ---
             predictions = run_prediction(global_loaded_model, actual_image_subfolder)
 
+            # --- Bước 3: Giải thích bằng LIME
+            # Chuẩn bị ảnh để giải thích
+            images, image_names = load_and_preprocess_images(actual_image_subfolder)
+            lime_explanation_dir = os.path.join(apk_specific_output_dir, "lime_explanation")
+            os.makedirs(lime_explanation_dir, exist_ok=True)
+
+            # Giải thích (các) ảnh
+            for image, image_name in zip(images, image_names):
+                try:
+                    Image_explainer(image, global_loaded_model, lime_explanation_dir, image_name)
+                except Exception as e:
+                    print(f"Lỗi trong quá trình giải thích: {e}")
+                    pass
+
             # Lấy danh sách các ảnh đã tạo để gửi về frontend + đọc dữ liệu từ output.csv và gửi lên frontend 
             image_urls = []
+            lime_image_urls = []
             if os.path.exists(actual_image_subfolder):
                 for file_type_dir in os.listdir(actual_image_subfolder):
                     full_type_dir_path = os.path.join(actual_image_subfolder, file_type_dir)
@@ -116,6 +131,14 @@ def upload_apk():
                                 # Đường dẫn sẽ là extracted_images/{apk_sha256}/{file_type_dir}/{img_file}
                                 relative_path = os.path.relpath(os.path.join(full_type_dir_path, img_file), EXTRACTED_IMAGES_FOLDER)
                                 image_urls.append(f"/extracted_images/{relative_path.replace(os.sep, '/')}")
+
+            # Thu thập ảnh giải thích LIME
+            if os.path.exists(lime_explanation_dir):
+                for lime_img_file in os.listdir(lime_explanation_dir):
+                    if lime_img_file.endswith(".png") and "_explained" in lime_img_file: # LIME images might be named like lime_explanation_channel_X.png
+                        relative_path = os.path.relpath(os.path.join(lime_explanation_dir, lime_img_file), EXTRACTED_IMAGES_FOLDER)
+                        lime_image_urls.append(f"/extracted_images/{relative_path.replace(os.sep, '/')}")
+
 
             static_feat = get_manifest_info(new_filename, STATIC_FEATURES_CSV)
             if static_feat is None:
@@ -136,7 +159,8 @@ def upload_apk():
                 "message": "Xử lý APK thành công",
                 "extracted_info": extracted_info,
                 "predictions": predictions,
-                "image_urls": image_urls
+                "image_urls": image_urls,
+                "lime_image_urls": lime_image_urls
             }), 200
 
         except Exception as e:
@@ -155,6 +179,7 @@ def upload_apk():
 def get_results_by_sha256(sha256):
     # đường dẫn đến hình: EXTRACTED_IMAGES_FOLDER/extracted_images/<sha256>/<file_types>
     apk_specific_output_dir = os.path.join(EXTRACTED_IMAGES_FOLDER,"extracted_images", sha256)
+    lime_explanation_output_dir = os.path.join(apk_specific_output_dir, "lime_explanation")
     actual_image_subfolder = os.path.join(apk_specific_output_dir, "images")
 
     if not os.path.exists(apk_specific_output_dir):
@@ -163,9 +188,11 @@ def get_results_by_sha256(sha256):
     # Tái tạo lại dữ liệu tương tự như khi upload_apk trả về
     predictions = []
     image_urls = []
+    lime_image_urls = []
     extracted_info = {}
 
     # 1. Tải ảnh URLs
+    # Tải ảnh thường
     if os.path.exists(actual_image_subfolder):
         for file_type_dir in os.listdir(actual_image_subfolder):
             full_type_dir_path = os.path.join(actual_image_subfolder, file_type_dir)
@@ -174,9 +201,16 @@ def get_results_by_sha256(sha256):
                     if img_file.endswith(".png") and os.path.splitext(img_file)[0] == sha256:
                         relative_path = os.path.relpath(os.path.join(full_type_dir_path, img_file), EXTRACTED_IMAGES_FOLDER)
                         image_urls.append(f"/extracted_images/{relative_path.replace(os.sep, '/')}")
+
+    # Tải ảnh giải thích
+    if os.path.exists(lime_explanation_output_dir):
+        for lime_img_file in os.listdir(lime_explanation_output_dir):
+            if lime_img_file.endswith(".png") and "_explained" in lime_img_file: # LIME images might be named like lime_explanation_channel_X.png
+                relative_path = os.path.relpath(os.path.join(lime_explanation_output_dir, lime_img_file), EXTRACTED_IMAGES_FOLDER)
+                lime_image_urls.append(f"/extracted_images/{relative_path.replace(os.sep, '/')}")
     
     # 2. Thực hiện lại dự đoán (hoặc lưu kết quả dự đoán và tải lại)
-    # Để đơn giản, tôi sẽ chạy lại dự đoán. Nếu mô hình lớn, cân nhắc lưu và tải lại kết quả.
+    # Để đơn giản, chạy lại dự đoán. Nếu mô hình lớn, cân nhắc lưu và tải lại kết quả.
     if global_loaded_model:
         predictions = run_prediction(global_loaded_model, actual_image_subfolder)
     else:
@@ -204,7 +238,8 @@ def get_results_by_sha256(sha256):
         "message": "Kết quả đã tải thành công",
         "extracted_info": extracted_info,
         "predictions": predictions,
-        "image_urls": image_urls
+        "image_urls": image_urls,
+        "lime_image_urls": lime_image_urls
     }), 200
 
 

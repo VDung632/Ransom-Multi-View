@@ -12,6 +12,7 @@ function ResultPage({ initialApkData, onUploadError }) {
   const [apkInfo, setApkInfo] = useState(initialApkData ? initialApkData.extracted_info : null);
   const [predictions, setPredictions] = useState(initialApkData ? initialApkData.predictions : []);
   const [imageUrls, setImageUrls] = useState(initialApkData ? initialApkData.image_urls : []);
+  const [lime_image_urls, SetLimeUrls] = useState(initialApkData ? initialApkData.lime_image_urls : [])
   const [loading, setLoading] = useState(!initialApkData);
   const [error, setError] = useState(null);
 
@@ -28,6 +29,7 @@ function ResultPage({ initialApkData, onUploadError }) {
             setApkInfo(data.extracted_info);
             setPredictions(data.predictions);
             setImageUrls(data.image_urls);
+            SetLimeUrls(data.lime_image_urls)
           } else {
             setError(data.error || "Không thể tải kết quả từ server.");
             onUploadError(data.error || "Không thể tải kết quả từ server.");
@@ -65,7 +67,7 @@ function ResultPage({ initialApkData, onUploadError }) {
       {apkInfo?.static_features && (
         <StaticFeaturesDisplay features={apkInfo.static_features} />
       )}
-      <ImageDisplay imageUrls={imageUrls} />
+      <ImageDisplay imageUrls={imageUrls} limeImageUrls={lime_image_urls} />
       <p><a href="/">Quay lại trang chủ để tải lên tệp khác</a></p>
     </div>
   );

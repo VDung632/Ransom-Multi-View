@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import './ImageDisplay.css'; // Thêm file CSS mới cho modal
 
-function ImageDisplay({ imageUrls }) {
+function ImageDisplay({ imageUrls, limeImageUrls }) {
 
   const [selectedImage, setSelectedImage] = useState(null); // State để lưu URL ảnh phóng to
 
@@ -20,15 +20,8 @@ function ImageDisplay({ imageUrls }) {
   }, [selectedImage]); // Chạy lại khi selectedImage thay đổi
 
   if (!imageUrls || imageUrls.length === 0) return null;
+  if (!limeImageUrls || limeImageUrls.length === 0) return null;
   
-  // Sắp xếp các URL ảnh để hiển thị theo thứ tự mong muốn
-  const sortedImageUrls = [...imageUrls].sort((a, b) => {
-    const order = ["xml", "arsc", "dex", "jar", "static"];
-    const typeA = order.findIndex(type => a.includes(type));
-    const typeB = order.findIndex(type => b.includes(type));
-    return typeA - typeB;
-  });
-
   const getImageType = (url) => {
     const parts = url.split('/');
     for (let i = 0; i < parts.length; i++) {
@@ -36,9 +29,35 @@ function ImageDisplay({ imageUrls }) {
       if (part.endsWith('_images') && part !== 'extracted_images') {
         return part.replace('_images', '');
       }
+      else if (part.endsWith('_explained.png')){
+        return part.split("_")[1];
+      }
     }
     return '';
   };
+
+  const groupedImages = {};
+  const fileTypesOrder = ["xml", "arsc", "dex", "jar", "static"];
+
+  fileTypesOrder.forEach(type => {
+      groupedImages[type] = { extracted: null, lime: null };
+  });
+
+  // Điền ảnh trích xuất
+  imageUrls.forEach(url => {
+    const type = getImageType(url);
+    if (type) {
+      groupedImages[type].extracted = url;
+    }
+  });
+
+  // Điền ảnh LIME
+  limeImageUrls.forEach(url => {
+    const type = getImageType(url);
+    if (type) {
+      groupedImages[type].lime = url;
+    }
+  });
 
   const handleImageClick = (url) => {
     setSelectedImage(url); // Khi ảnh được click, lưu URL vào state
@@ -50,27 +69,45 @@ function ImageDisplay({ imageUrls }) {
 
   return (
     <div className="image-display">
-      <h3>Ảnh đã trích xuất</h3>
-      <div className="image-grid">
-        {sortedImageUrls.map((url, index) => (
-          <div key={index} className="image-item">
-            <p className="image-type">Loại: <strong>{getImageType(url).toUpperCase()}</strong></p>
-            {/* Thêm onClick handler vào ảnh */}
-            <img 
-              src={`http://localhost:5000${url}`} 
-              alt={`Extracted Image ${index}`} 
-              onClick={() => handleImageClick(`http://localhost:5000${url}`)} 
-              style={{ cursor: 'pointer' }} // Thêm cursor để người dùng biết có thể click
-            />
-          </div>
+      <h3>Ảnh đã trích xuất và Giải thích LIME</h3>
+      <div className="image-grid-container"> {/* Thêm container mới cho grid */}
+        {fileTypesOrder.map(type => (
+          (groupedImages[type].extracted || groupedImages[type].lime) ? (
+            <div key={type} className="image-pair-group">
+              <p className="image-type-header">Loại: <strong>{type.toUpperCase()}</strong></p>
+              <div className="image-pair">
+                {groupedImages[type].extracted && (
+                  <div className="image-item">
+                    <img 
+                      src={`http://localhost:5000${groupedImages[type].extracted}`} 
+                      alt={`Ảnh trích xuất loại ${type}`} 
+                      onClick={() => handleImageClick(`http://localhost:5000${groupedImages[type].extracted}`)} 
+                      style={{ cursor: 'pointer' }} 
+                    />
+                    <p>Ảnh gốc</p>
+                  </div>
+                )}
+                {groupedImages[type].lime && (
+                  <div className="image-item">
+                    <img 
+                      src={`http://localhost:5000${groupedImages[type].lime}`} 
+                      alt={`Giải thích LIME loại ${type}`} 
+                      onClick={() => handleImageClick(`http://localhost:5000${groupedImages[type].lime}`)} 
+                      style={{ cursor: 'pointer' }} 
+                    />
+                    <p>Giải thích LIME</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : null
         ))}
       </div>
 
-      {/* Modal hiển thị ảnh phóng to */}
       {selectedImage && (
         <div className="modal-overlay" onClick={handleCloseModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}> {/* Ngăn chặn click lan truyền */}
-            <img src={selectedImage} alt="Phóng to" className="modal-image" />
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <img src={selectedImage} alt="Ảnh phóng to" className="modal-image" />
             <button className="close-button" onClick={handleCloseModal}>X</button>
           </div>
         </div>

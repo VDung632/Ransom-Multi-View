@@ -158,6 +158,9 @@ def extract_manifest_info(apk_raw, output_dir):
                 writer.writerow(Value)
         print("Static Features Done!!!")
 
+        # Clean up
+        cleanup_dupes(output_file_path)
+
     except Exception as e:
         print(f"An error occurred: {e}")
         raise e
@@ -276,6 +279,7 @@ def get_manifest_info(apk_name, output_csv):
     Args:
         apk_name (str): Tên file APK cần tìm thông tin.
         output_csv (str): Đường dẫn đến file CSV chứa thông tin APK.
+        rename_apk (str): Thay đổi giá trị trường FileName (trường tên gốc của apk)
     Returns:
         dict: Thông tin của APK dưới dạng từ điển, hoặc None nếu không tìm thấy.
     """
@@ -303,6 +307,12 @@ def get_manifest_info(apk_name, output_csv):
     except Exception as e:
         print(f"Đã xảy ra lỗi khi đọc file CSV: {e}")
         return None
+
+def cleanup_dupes(output_csv):
+    # Dọn dẹp output.csv chỉ giữ lại bản mới nhất
+    df = pd.read_csv(output_csv)
+    df.drop_duplicates(subset=['FileName'], keep='last')
+    df.to_csv(output_csv, index=False)
 
 if __name__ == "__main__":
     # example usage
