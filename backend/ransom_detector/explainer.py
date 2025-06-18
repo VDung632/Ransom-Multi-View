@@ -1,6 +1,10 @@
 import numpy as np
 from lime import lime_image
 from skimage.segmentation import mark_boundaries, felzenszwalb
+
+# dùng backend matplotlib không có GUI
+import matplotlib
+matplotlib.use('Agg')  # Sử dụng 'Agg' để không cần GUI
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow import keras

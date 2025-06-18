@@ -17,7 +17,7 @@ function PredictionAndInfoDisplay({ predictions, info }) {
 
         <div className="apk-info-section">
           <h4>Thông tin APK đã trích xuất</h4> {/* Tiêu đề con */}
-          <p><strong>Tên gốc tệp:</strong> {info.original_filename}</p>
+          <p><strong>Tên tệp:</strong> {info.original_filename}</p>
           <p><strong>SHA256:</strong> {info.file_sha256}</p>
           <p><strong>Tên gói:</strong> {info.package_name || "Đang cập nhật..."}</p>
         </div>

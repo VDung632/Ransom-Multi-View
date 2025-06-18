@@ -70,6 +70,13 @@
   padding: 15px 20px;
 }
 
+.accordion-content.open > .accordion-section > .accordion-content.sub-content {
+    max-height: 1000px; /* Chiều cao cố định cho phần cuộn */
+    overflow-y: auto; /* Thêm thanh cuộn dọc */
+    -webkit-overflow-scrolling: touch;
+    padding-right: 5px; /* Để tránh nội dung chạm vào thanh cuộn */
+}
+
 .accordion-content ul {
   list-style-type: disc;
   padding-left: 20px;

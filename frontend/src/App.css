@@ -253,6 +253,7 @@ main {
   border-radius: 5px;
   padding: 10px;
   background-color: #ffffff;
+  overflow-x: auto;
 }
 
 .static-features-display .feature-list-item h5 {

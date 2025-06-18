@@ -108,7 +108,6 @@ function StaticFeaturesDisplay({ features }) {
             </div>
             {isDetailedListOpen && (
               <div className={`accordion-content sub-content ${isDetailedListOpen ? 'open' : ''}`}>
-                <h4 style={{width: "100%"}}>Danh sách chi tiết</h4>
                 {listKeys.map(key => {
                   const rawValue = listFeatures[key];
                   // Sử dụng hàm mới để phân tích cú pháp chuỗi

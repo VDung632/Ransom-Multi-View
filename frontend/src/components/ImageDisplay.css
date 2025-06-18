@@ -75,37 +75,17 @@ body.no-scroll {
 
 /* Kế thừa các style từ App.css nếu cần */
 .image-display {
-  /* Các style cũ của .image-display trong App.css */
   text-align: left;
   padding: 15px;
   border: 1px solid #ddd;
   border-radius: 5px;
   background-color: #f5f5f5;
-}
-
-.image-item img {
-    /* Đảm bảo ảnh trong grid có kích thước phù hợp và có thể click được */
-    max-width: 100%;
-    height: auto;
-    display: block;
-    margin: 0 auto 10px auto;
-    border: 1px solid #eee;
-    cursor: pointer; /* Quan trọng: báo hiệu ảnh có thể click */
-}
-
-/* Phần trình bày 2 ảnh */
-.image-display {
-  text-align: left;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  background-color: #f5f5f5;
-  margin-top: 20px; /* Thêm khoảng cách nếu cần */
+  margin-top: 20px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .image-display h3 {
-  text-align: center; /* Căn giữa tiêu đề */
+  text-align: center;
   color: #333;
   margin-top: 0;
   margin-bottom: 20px;
@@ -113,7 +93,8 @@ body.no-scroll {
 
 .image-grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Mỗi cột ít nhất 280px để chứa cặp ảnh */
+  /* Mỗi loại ảnh chiếm hết một hàng */
+  grid-template-columns: 1fr; /* Chỉ một cột, chiếm toàn bộ chiều rộng */
   gap: 20px; /* Khoảng cách giữa các nhóm loại ảnh */
 }
 
@@ -121,51 +102,86 @@ body.no-scroll {
   border: 1px solid #ccc;
   border-radius: 8px;
   background-color: #fff;
-  padding-bottom: 10px; /* Padding dưới cho nhóm */
+  padding-bottom: 10px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  /* Đảm bảo chiếm toàn bộ chiều rộng đã định bởi grid-template-columns */
+  width: 100%; 
 }
 
 .image-type-header {
   text-align: center;
   font-weight: bold;
-  font-size: 1.1em;
-  padding: 10px 0;
+  font-size: 1.2em; /* Tăng kích thước font */
+  padding: 12px 0; /* Tăng padding */
   margin: 0;
   background-color: #e9e9e9;
   border-bottom: 1px solid #ddd;
   border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
+  border-top-right-radius: 8rud;
 }
 
 .image-pair {
-  display: flex; /* Sử dụng flexbox để đặt ảnh gốc và LIME cạnh nhau */
+  display: flex;
+  /* Đặt ảnh gốc bên trái, ảnh LIME bên phải */
+  flex-direction: row; /* Đảm bảo chúng nằm trên cùng một hàng */
   justify-content: space-around; /* Phân phối không gian đều */
   align-items: flex-start; /* Căn chỉnh từ trên xuống */
-  gap: 10px; /* Khoảng cách giữa ảnh gốc và LIME */
-  padding: 15px;
+  gap: 20px; /* Tăng khoảng cách giữa ảnh gốc và LIME */
+  padding: 20px; /* Tăng padding cho cặp ảnh */
+  /* Cho phép xuống dòng nếu màn hình quá nhỏ */
+  flex-wrap: wrap; 
 }
 
 .image-item {
   flex: 1; /* Cho phép các ảnh item co giãn */
-  min-width: 120px; /* Đảm bảo kích thước tối thiểu cho mỗi ảnh */
+  min-width: 200px; /* Tăng kích thước tối thiểu cho mỗi ảnh */
+  max-width: 50%; /* Mỗi ảnh chiếm tối đa 50% của cặp */
+  box-sizing: border-box; /* Đảm bảo padding không làm tràn */
   text-align: center;
-  border: 1px solid #eee; /* Viền nhẹ cho mỗi ảnh */
-  padding: 5px;
+  border: 1px solid #eee;
+  padding: 10px; /* Tăng padding */
   border-radius: 5px;
+  display: flex; /* Dùng flex cho nội dung của image-item */
+  flex-direction: column; /* Sắp xếp ảnh và chữ theo cột */
+  align-items: center; /* Căn giữa nội dung trong image-item */
+  justify-content: center;
 }
 
 .image-item img {
-  max-width: 100%;
-  height: auto;
+  /* Điều chỉnh kích thước ảnh hiển thị */
+  width: 256px; /* Kích thước cố định hoặc lớn hơn cho ảnh */
+  height: 256px; /* Kích thước cố định, đảm bảo cả 2 ảnh bằng nhau */
+  object-fit: contain; /* Giữ tỷ lệ khung hình, ảnh sẽ nằm gọn trong kích thước này */
   display: block;
-  margin: 0 auto 5px auto; /* Khoảng cách với label */
-  border: none; /* Bỏ viền cũ */
+  margin: 0 auto 10px auto; /* Khoảng cách với label */
+  border: none;
   cursor: pointer;
+  /* Thêm hiệu ứng cho ảnh nếu muốn */
+  transition: transform 0.2s ease-in-out;
+}
+
+.image-item img:hover {
+    transform: scale(1.02); /* Phóng to nhẹ khi hover */
 }
 
 .image-item p {
-  font-size: 0.85em;
+  font-size: 1em; /* Tăng kích thước font cho label ảnh */
   color: #666;
   word-break: break-all;
-  margin: 0; /* Loại bỏ margin mặc định */
+  margin: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .image-pair {
+        flex-direction: column; /* Trên màn hình nhỏ, ảnh sẽ xếp chồng lên nhau */
+        align-items: center; /* Căn giữa khi xếp chồng */
+    }
+    .image-item {
+        max-width: 100%; /* Mỗi ảnh chiếm toàn bộ chiều rộng của nhóm */
+    }
+    .image-item img {
+        width: 180px; /* Kích thước nhỏ hơn trên mobile */
+        height: 180px;
+    }
 }
