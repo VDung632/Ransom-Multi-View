@@ -1,6 +1,5 @@
 __pycache__/
 extracted_images/
-Static_Features/
 apk_procession_output/
 uploads/
 ransom_detector/Tuned_ConvNeXt.h5
