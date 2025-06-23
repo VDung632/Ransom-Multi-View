@@ -1,0 +1,58 @@
+# backend/Dockerfile.backend
+
+# Sử dụng một base image Python với các công cụ phát triển cần thiết
+FROM python:3.9-slim-buster
+
+# Cài đặt các dependencies hệ thống cần thiết cho Pillow, tensorflow, matplotlib, v.v.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    default-jre \
+    git \
+    libffi-dev \
+    libssl-dev \
+    zlib1g-dev \
+    libjpeg-dev \
+    libpng-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Tạo thư mục cho dex-tools và tải về
+WORKDIR /opt
+RUN mkdir dex-tools && \
+    wget https://github.com/pxb1988/dex2jar/releases/download/2.1/dex-tools-2.1-SNAPSHOT.zip -O dex-tools.zip && \
+    unzip dex-tools.zip -d dex-tools && \
+    rm dex-tools.zip
+
+# Cấp quyền thực thi cho các script dex2jar
+RUN chmod +x /opt/dex-tools/*.sh
+
+# Tạo thư mục làm việc trong container
+WORKDIR /app
+
+# Copy các file requirements trước để tận dụng Docker cache layers
+COPY backend/requirements.txt ./
+COPY backend/apk2img_tool/requirement.txt ./apk2img_tool_requirements.txt
+COPY backend/ransom_detector/requirement.txt ./ransom_detector_requirements.txt
+
+# Cài đặt các dependencies Python
+RUN pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir -r apk2img_tool_requirements.txt && \
+    pip install --no-cache-dir -r ransom_detector_requirements.txt
+
+# Đặt biến môi trường cho Matplotlib để sử dụng backend non-GUI
+ENV MPLBACKEND=Agg
+
+# Copy toàn bộ mã nguồn ứng dụng backend vào container
+COPY backend/ .
+# Đảm bảo thư mục static features có sẵn cho androguard
+RUN mkdir -p Static_Features
+RUN mkdir -p errors # Thư mục errors cho dex2jar
+
+# Tạo các thư mục cần thiết cho ứng dụng
+RUN mkdir -p uploads processed_apks_output
+
+# Expose port mà Flask app sẽ chạy
+EXPOSE 5000
+
+# Lệnh mặc định để chạy ứng dụng Flask
+CMD ["python", "app.py"]

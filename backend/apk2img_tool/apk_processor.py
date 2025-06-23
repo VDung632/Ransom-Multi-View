@@ -72,7 +72,7 @@ def dex2jar(apk_path, output_dir, jar_name):
         jar_name (str): Name of the output JAR file.
     """
 
-    dex2jar_dir = r"D:\dex-tools-v2.4" # path to dex2jar directory
+    dex2jar_dir = r"/opt/dex2jar" # path to dex2jar directory
     error_dir = r"errors"
 
     try:

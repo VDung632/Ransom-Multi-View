@@ -68,6 +68,7 @@
 .accordion-content.open {
   max-height: 1000px; /* Một giá trị đủ lớn để hiển thị nội dung, cần điều chỉnh nếu nội dung rất dài */
   padding: 15px 20px;
+  overflow-y: auto; /* Thêm thanh cuộn dọc nếu nội dung quá dài */
 }
 
 .accordion-content.open > .accordion-section > .accordion-content.sub-content {
