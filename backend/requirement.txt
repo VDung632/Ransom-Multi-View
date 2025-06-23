@@ -10,4 +10,4 @@ pandas
 scikit-learn
 matplotlib
 androguard
-Pillow
+tf_keras

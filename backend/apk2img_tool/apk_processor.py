@@ -72,7 +72,7 @@ def dex2jar(apk_path, output_dir, jar_name):
         jar_name (str): Name of the output JAR file.
     """
 
-    dex2jar_dir = r"/opt/dex2jar" # path to dex2jar directory
+    dex2jar_dir = r"/opt/dex2jar" # path to dex2jar directory for docker
     error_dir = r"errors"
 
     try:
@@ -87,6 +87,8 @@ def dex2jar(apk_path, output_dir, jar_name):
                         os.path.join(output_dir, jar_name), "-e", error_file]
             subprocess.run(command, check=True)
         elif os.name == 'posix':
+            # local testing
+            # dex2jar_dir = "/mnt/d/dex-tools-v2.4"
             dex2jar_path = "d2j-dex2jar.sh"
             dex2jar_path = os.path.join(dex2jar_dir, dex2jar_path)
             subprocess.run(

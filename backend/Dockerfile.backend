@@ -19,7 +19,7 @@ RUN apt-get update && \
 # Tạo thư mục cho dex-tools và tải về
 WORKDIR /opt
 RUN mkdir dex-tools && \
-    wget https://github.com/pxb1988/dex2jar/releases/download/2.1/dex-tools-2.1-SNAPSHOT.zip -O dex-tools.zip && \
+    wget https://github.com/pxb1988/dex2jar/archive/refs/tags/v2.4.zip -O dex-tools.zip && \
     unzip dex-tools.zip -d dex-tools && \
     rm dex-tools.zip
 
@@ -31,13 +31,9 @@ WORKDIR /app
 
 # Copy các file requirements trước để tận dụng Docker cache layers
 COPY backend/requirements.txt ./
-COPY backend/apk2img_tool/requirement.txt ./apk2img_tool_requirements.txt
-COPY backend/ransom_detector/requirement.txt ./ransom_detector_requirements.txt
 
 # Cài đặt các dependencies Python
-RUN pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir -r apk2img_tool_requirements.txt && \
-    pip install --no-cache-dir -r ransom_detector_requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Đặt biến môi trường cho Matplotlib để sử dụng backend non-GUI
 ENV MPLBACKEND=Agg
