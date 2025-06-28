@@ -22,7 +22,8 @@ function ResultPage({ initialApkData, onUploadError }) {
         setLoading(true);
         setError(null);
         try {
-          const response = await fetch(`http://localhost:5000/results/${sha256}`);
+          const backendUrl = process.env.REACT_APP_BACKEND_URL;
+          const response = await fetch(`${backendUrl}/results/${sha256}`);
           const data = await response.json();
 
           if (response.ok) {

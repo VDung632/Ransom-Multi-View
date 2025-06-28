@@ -57,7 +57,8 @@ function ApkUpload({ onUploadSuccess, onUploadError }) {
     formData.append('apk_file', selectedFile);
 
     try {
-      const response = await fetch('http://localhost:5000/upload-apk', {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL;
+      const response = await fetch(`${backendUrl}/upload-apk`, {
         method: 'POST',
         body: formData,
       });

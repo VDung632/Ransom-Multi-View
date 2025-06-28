@@ -31,13 +31,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(EXTRACTED_IMAGES_FOLDER, exist_ok=True)
 
 global_loaded_model = None # Khởi tạo biến toàn cục
-try:
-    global_loaded_model = load_model_once(MODEL_PATH)
-    if global_loaded_model is None:
-        print("CẢNH BÁO: Không thể tải mô hình. Chức năng dự đoán sẽ không hoạt động.")
-except Exception as e:
-    print(f"Lỗi khi tải mô hình ngoài luồng yêu cầu: {e}")
-    global_loaded_model = None
+
 
 
 @app.route('/upload-apk', methods=['POST'])
@@ -250,9 +244,20 @@ def serve_extracted_images(filename):
     """
     return send_from_directory(EXTRACTED_IMAGES_FOLDER, filename)
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    return jsonify({"status": "healthy"}), 200
 
 if __name__ == '__main__':
     # Cần đặt thư mục làm việc hiện tại thành thư mục chứa app.py
     # để đảm bảo các đường dẫn tương đối hoạt động chính xác (ví dụ: MODEL_PATH)
+    try:
+        global_loaded_model = load_model_once(MODEL_PATH)
+        if global_loaded_model is None:
+            print("CẢNH BÁO: Không thể tải mô hình. Chức năng dự đoán sẽ không hoạt động.")
+    except Exception as e:
+        print(f"Lỗi khi tải mô hình ngoài luồng yêu cầu: {e}")
+        global_loaded_model = None
+
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)

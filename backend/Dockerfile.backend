@@ -14,35 +14,45 @@ RUN apt-get update && \
     zlib1g-dev \
     libjpeg-dev \
     libpng-dev \
+    wget \
+    unzip \
     && rm -rf /var/lib/apt/lists/*
 
 # Tạo thư mục cho dex-tools và tải về
 WORKDIR /opt
 RUN mkdir dex-tools && \
-    wget https://github.com/pxb1988/dex2jar/archive/refs/tags/v2.4.zip -O dex-tools.zip && \
+    wget https://github.com/pxb1988/dex2jar/releases/download/v2.4/dex-tools-v2.4.zip -O dex-tools.zip && \
     unzip dex-tools.zip -d dex-tools && \
     rm dex-tools.zip
 
 # Cấp quyền thực thi cho các script dex2jar
-RUN chmod +x /opt/dex-tools/*.sh
+RUN chmod +x /opt/dex-tools/dex-tools-v2.4/*.sh
+ENV DEX2JAR_PATH=/opt/dex-tools/dex-tools-v2.4/
 
 # Tạo thư mục làm việc trong container
 WORKDIR /app
 
 # Copy các file requirements trước để tận dụng Docker cache layers
-COPY backend/requirements.txt ./
+COPY ./backend/requirement.txt ./requirements.txt
 
 # Cài đặt các dependencies Python
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Đặt biến môi trường cho Matplotlib để sử dụng backend non-GUI
 ENV MPLBACKEND=Agg
+ENV TF_USE_LEGACY_KERAS=1
 
 # Copy toàn bộ mã nguồn ứng dụng backend vào container
 COPY backend/ .
 # Đảm bảo thư mục static features có sẵn cho androguard
 RUN mkdir -p Static_Features
 RUN mkdir -p errors # Thư mục errors cho dex2jar
+
+# # Copy trong localhost
+# COPY backend/ransom_detector/Tuned_ConvNeXt.h5 /app/ransom_detector/Tuned_ConvNeXt.h5
+
+# Tải về từ github release
+RUN wget <github_link> -O /app/ransom_detector/Tuned_ConvNeXt.h5
 
 # Tạo các thư mục cần thiết cho ứng dụng
 RUN mkdir -p uploads processed_apks_output

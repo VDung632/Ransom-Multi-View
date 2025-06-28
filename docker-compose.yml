@@ -8,30 +8,18 @@ services:
       dockerfile: backend/Dockerfile.backend # Đường dẫn đến Dockerfile của backend
     ports:
       - "5000:5000" # Map port 5000 của host với port 5000 của container backend
-    volumes:
-      # Map thư mục dữ liệu cục bộ vào container để giữ dữ liệu liên tục
-      - ./backend/uploads:/app/uploads
-      # - ./backend/processed_apks_output:/app/processed_apks_output
-      # Map thư mục model để không cần rebuild image khi model thay đổi
-      - ./backend/ransom_detector/Tuned_ConvNeXt.h5:/app/ransom_detector/Tuned_ConvNeXt.h5
     environment:
       # Cấu hình biến môi trường nếu cần cho backend
       FLASK_ENV: production # Đổi sang development nếu bạn muốn debug
       # URL của frontend (nếu backend cần biết, thường thì không cần)
       # FRONTEND_URL: http://localhost:3000
-    depends_on:
-      - frontend # Backend phụ thuộc vào frontend để khởi tạo
 
   frontend:
     build:
       context: . # Build context là thư mục gốc của dự án
       dockerfile: frontend/Dockerfile.frontend # Đường dẫn đến Dockerfile của frontend
-    ports:
-      - "3000:80" # Map port 3000 của host với port 80 của container frontend (serve chạy trên port 80)
     environment:
-      # Biến môi trường cho React app (phải bắt đầu bằng REACT_APP_)
-      # Đảm bảo frontend biết URL của backend
-      REACT_APP_BACKEND_URL: http://localhost:5000 # Hoặc tên service 'backend' nếu frontend gọi từ bên trong Docker network # Nếu gọi từ trình duyệt, phải là localhost
-    depends_on:
-      # Frontend có thể không phụ thuộc vào backend, nhưng thường nên có để đảm bảo thứ tự khởi động
-      - backend
+      NODE_ENV: production
+    ports:
+      - "29001:80"
+    

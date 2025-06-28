@@ -88,7 +88,7 @@ def dex2jar(apk_path, output_dir, jar_name):
             subprocess.run(command, check=True)
         elif os.name == 'posix':
             # local testing
-            # dex2jar_dir = "/mnt/d/dex-tools-v2.4"
+            dex2jar_dir = os.environ["DEX2JAR_PATH"]
             dex2jar_path = "d2j-dex2jar.sh"
             dex2jar_path = os.path.join(dex2jar_dir, dex2jar_path)
             subprocess.run(
