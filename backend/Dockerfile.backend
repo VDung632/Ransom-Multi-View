@@ -52,7 +52,7 @@ RUN mkdir -p errors # Thư mục errors cho dex2jar
 # COPY backend/ransom_detector/Tuned_ConvNeXt.h5 /app/ransom_detector/Tuned_ConvNeXt.h5
 
 # Tải về từ github release
-RUN wget <github_link> -O /app/ransom_detector/Tuned_ConvNeXt.h5
+RUN wget https://github.com/IECResearchGroup/IEC2021SE05_MultiViewAR-Detector/releases/download/model/Tuned_ConvNeXt.h5 -O /app/ransom_detector/Tuned_ConvNeXt.h5
 
 # Tạo các thư mục cần thiết cho ứng dụng
 RUN mkdir -p uploads processed_apks_output
