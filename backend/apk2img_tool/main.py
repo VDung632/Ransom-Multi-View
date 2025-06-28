@@ -24,8 +24,6 @@ def process_apk(input_dir, output_dir, file_types,
     output_img_types = ""
     static_out_dir = "" # output.csv save path
 
-    
-
     if all_in_one:
         output_img_types = os.path.join(output_dir, "images")
         create_directories([output_img_types])

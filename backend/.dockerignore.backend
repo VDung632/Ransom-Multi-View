@@ -1,0 +1,27 @@
+# backend/.dockerignore.backend
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+*.egg-info/
+.cache/
+.pytest_cache/
+.ipynb_checkpoints/
+.mypy_cache/
+.ruff_cache/
+.vscode/
+.git/
+.gitignore
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.DS_Store
+# Các thư mục output lớn mà không cần copy vào image
+uploads/
+ransom_detector/Tuned_ConvNeXt.h5 # Sẽ copy riêng nếu cần, tránh rebuild khi model thay đổi
+# Nếu model của bạn rất lớn và thay đổi thường xuyên, cân nhắc bỏ dòng trên
+# và COPY Tuned_ConvNeXt.h5 sau khi các layers khác đã cache
+apk_procession_output/

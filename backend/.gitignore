@@ -4,3 +4,4 @@ Static_Features/
 apk_procession_output/
 uploads/
 ransom_detector/Tuned_ConvNeXt.h5
+ransom_detector/lime_explanations_per_channel_two_classes/

@@ -1,7 +1,13 @@
 Flask
 Pillow
-tensorflow
-numpy
+tensorflow[and-cuda]
+numpy==1.26.4
 androguard 
 pandas 
 Flask-Cors
+lime
+pandas
+scikit-learn
+matplotlib
+androguard
+tf_keras

@@ -1,0 +1,25 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: . # Build context là thư mục gốc của dự án
+      dockerfile: backend/Dockerfile.backend # Đường dẫn đến Dockerfile của backend
+    ports:
+      - "5000:5000" # Map port 5000 của host với port 5000 của container backend
+    environment:
+      # Cấu hình biến môi trường nếu cần cho backend
+      FLASK_ENV: production # Đổi sang development nếu bạn muốn debug
+      # URL của frontend (nếu backend cần biết, thường thì không cần)
+      # FRONTEND_URL: http://localhost:3000
+
+  frontend:
+    build:
+      context: . # Build context là thư mục gốc của dự án
+      dockerfile: frontend/Dockerfile.frontend # Đường dẫn đến Dockerfile của frontend
+    environment:
+      NODE_ENV: production
+    ports:
+      - "29001:80"
+    
